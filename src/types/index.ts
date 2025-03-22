@@ -9,9 +9,13 @@ export interface InputProps {
 
 export interface ColumnProps {
   tasks: Task[];
+  setSelectedTask: (selectedTask: number[]) => void;
+  selectedTask: number[];
 }
 
 export interface TaskProps {
   id: number;
   title: string;
+  setSelectedTask: (selectedTask: number[]) => void;
+  selectedTask: number[];
 }
