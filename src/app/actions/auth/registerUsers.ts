@@ -9,7 +9,8 @@ const registerUsers = async (payload: { email: string; password: string }) => {
 
   } catch (error) {
     console.error("Error registering user:", error);
-    if (error.response?.data?.error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (axios.isAxiosError(error) && error.response?.data?.error) {
       throw new Error(error.response.data.error);
     }
     throw new Error("Unknown error occurred");
