@@ -10,13 +10,13 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Column from "../Column/Column";
-import Input from "../Input/Input";
-import { useSession } from "next-auth/react";
+import { Task } from "@/types";
 
-const Current = () => {
-  const [tasks, setTasks] = useState<{ _id: string; id: string; title: string; task: string }[]>([]);
+const Completed = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const { data: session } = useSession();
 
   const sensors = useSensors(
@@ -29,13 +29,23 @@ const Current = () => {
    
 
     try {
-      if (session && session.user) {
-        const response = await axios.get(`/api/task?user=${session.user.email}`);
-        console.log(response);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sortedTasks = response.data.sort((a: any, b: any) => a.position - b.position);
-        setTasks(sortedTasks);
+      if (!session || !session.user) {
+        console.error("Session or user is not available");
+        return;
       }
+      const response = await axios.get(`/api/completed?user=${session.user.email}`);
+
+      const sortedTasks = response.data.map((task: Task) => ({
+        _id: task._id,
+        id: task.id,
+        title: task.title,
+        task: task.task,
+        createdAt: task.createdAt,
+      })).sort((a: { createdAt: string | number | Date; }, b: { createdAt: string | number | Date; }) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      setTasks(sortedTasks);
     } catch (err) {
       console.error("Error fetching tasks:", err);
       if (axios.isAxiosError(err) && err.response) {
@@ -72,10 +82,9 @@ const Current = () => {
       collisionDetection={closestCorners}
       onDragEnd={handleDragEnd}
     >
-      <Input />
       <Column tasks={tasks} />
     </DndContext>
   );
 };
 
-export default Current;
+export default Completed;

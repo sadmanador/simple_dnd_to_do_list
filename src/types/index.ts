@@ -1,17 +1,18 @@
 export interface Task {
-  id: number;
-  title: string;
-}
-
-export interface InputProps {
-  onSubmit: (title: string) => void;
+  createdAt?: string;
+  title?: string;
+  id?: string;
+  _id: string;
+  task: string;
 }
 
 export interface ColumnProps {
   tasks: Task[];
 }
 
+
+
 export interface TaskProps {
-  id: number;
+  id: string;
   title: string;
 }

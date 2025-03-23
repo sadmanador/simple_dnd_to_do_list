@@ -1,30 +1,51 @@
-import { InputProps } from "@/types";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 
-const Input: React.FC<InputProps> = ({ onSubmit }) => {
+const Input = () => {
+  const { data: session } = useSession(); // Destructure 'data' directly from session
   const [input, setInput] = useState("");
 
-  const handleSubmit = async (e) => {
+  console.log("User Info for making task:", session);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if user is logged in and input is not empty
+    if (!session?.user) {
+      alert("You must be logged in to add a task.");
+      return;
+    }
+    if (!input.trim()) {
+      alert("Task cannot be empty.");
+      return;
+    }
+
     try {
-      const response = await axios.post("/api/task", { task: input }); // Use "task" here
+      const response = await axios.post("/api/task", {
+        user: session.user?.email, // Adjust depending on session structure
+        task: input,
+        status: "CURRENT",
+      });
+
       console.log(response.data);
-      onSubmit(input);
-      setInput("");
+      window.location.reload(); 
     } catch (err) {
       console.error("Error submitting task:", err);
-      alert(`Error: ${err.response ? err.response.data.error : "Unknown error"}`);
+      if (axios.isAxiosError(err) && err.response) {
+        alert(`Error: ${err.response.data.error}`);
+      } else {
+        alert("Unknown error");
+      }
     }
   };
-  
 
   return (
     <div className="flex gap-2.5">
       <input
         type="text"
         placeholder="Add a task..."
-        className="border border-gray-300 p-2.5 rounded-sm w-full"
+        className="border border-gray-300 p-2.5 rounded-sm w-full text-black"
         onChange={(e) => setInput(e.target.value)}
       />
       <button

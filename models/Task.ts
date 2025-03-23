@@ -1,17 +1,27 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from "mongoose";
 
-// Define the schema
+
 const taskSchema = new Schema(
   {
-    input: {
+    user: {
       type: String,
-      required: [true, 'Input is required'],
+      required: true,
+    },
+    task: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ["CURRENT", "COMPLETED"],
+      default: "CURRENT",
     },
   },
   { timestamps: true }
 );
 
-// Ensure the model isn't redefined
-const Task = models.Task || model('Task', taskSchema);
+
+const Task = models.Task || model("Task", taskSchema);
 
 export default Task;

@@ -1,11 +1,11 @@
-import React from 'react';
+import SignUp from "@/components/SignUp/SignUp";
 
-const page = () => {
-    return (
-        <div>
-            home page
-        </div>
-    );
+const HomePage = async () => {
+  return (
+    <div>
+      <SignUp />
+    </div>
+  );
 };
 
-export default page;
+export default HomePage;
